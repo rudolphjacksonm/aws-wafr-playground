@@ -11,4 +11,4 @@ main() {
   create_milestone  "${workloadId}" "${milestoneName}"
 }
 
-get_workload_id | main "${MILESTONE_NAME}"
+main "${MILESTONE_NAME}"
