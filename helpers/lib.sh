@@ -11,8 +11,8 @@ get_workload_id() {
 }
 
 check_milestone() {
-  local workloadId=${1-null}
-  local milestoneName={$2-null}
+  local workloadId=${1:-null}
+  local milestoneName=${2:-null}
   check=$(aws wellarchitected list-milestones --workload-id "${workloadId}" --query "MilestoneSummaries[?MilestoneName=='$milestoneName']" --output text)
   if [[ -n "${check}" ]]; then
     echo "Milestone ${milestoneName} already exists for workload with ID ${workloadId}."
@@ -21,7 +21,7 @@ check_milestone() {
 }
 
 create_milestone() {
-  local workloadId=${1-null}
-  local milestoneName=${2-null}
+  local workloadId=${1:-null}
+  local milestoneName=${2:-null}
   aws wellarchitected create-milestone --workload-id "${workloadId}" --milestone-name "${milestoneName}"
 }
