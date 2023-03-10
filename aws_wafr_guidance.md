@@ -53,36 +53,29 @@ sustainability
 reviewOwner='someone@example.com'
 workloadName='waf-test-workload'
 ```
-In the main script, the variables above can be sourced and used to create a workload.
+By calling `create_workload.sh`, the variables above can be sourced and used to create a workload.
 ```bash
 #!/bin/bash
-#---in main.sh
-source config.env
+set -euo pipefail
+source config/test_workload.env
+source helpers/lib.sh
 
-function check_workload {
-  local workloadNamePrefix=$1
-  check=$(aws wellarchitected list-workloads --workload-name-prefix "${workloadNamePrefix}" | jq '.WorkloadSummaries[0].WorkloadId')
-  if [[ "null" != "${check}" ]]; then
-    echo "Workload with name $workloadNamePrefix already exists, exiting..."
-    exit 
-  fi
+main() {
+  aws wellarchitected create-workload \
+    --account-ids "${ACCOUNT_IDS}" \
+    --architectural-design "${ARCHITECTURAL_DESIGN}" \
+    --aws-regions "eu-west-1" "eu-west-2" \
+    --description "${DESCRIPTION}" \
+    --environment "${ENVIRONMENT}" \
+    --industry "${INDUSTRY}" \
+    --industry-type "${INDUSTRY_TYPE}" \
+    --lenses $LENSES \
+    --pillar-priorities $PILLAR_PRIORITIES \
+    --review-owner "${REVIEW_OWNER}" \
+    --workload-name "${WORKLOAD_NAME}"
 }
 
-check_workload "${workloadName}"
-
-aws wellarchitected create-workload \
---account-ids $accountIds \
---applications $applications \
---architectural-design $architecturalDesign \
---aws-regions $awsRegions \
---description $description \
---environment $environment \
---industry $industry \
---industry-type $industryType \
---lenses $lenses \
---pillar-priorities $pillarPriorities \
---review-owner $reviewOwner \
---workload-name $workloadName \
+main
 ```
 
 ### Creating Milestones
@@ -90,11 +83,19 @@ Milestones can be created whenever a release is generated via the AWS CLI. This 
 
 ```bash
 #!/bin/bash
-source config.env
-aws wellarchitected list-workloads --workload-name-prefix "${workloadName}" --query 'WorkloadSummaries[].WorkloadId' --output text
-aws wellarchitected create-milestone \
---workload-id "${workloadId}" \
---milestone-name <value> \
+set -euo pipefail
+# assuming MILESTONE_NAME is passed in via release pipeline
+source config/test_workload.env
+source helpers/lib.sh
+
+main() {
+  local milestoneName=$1
+  local workloadId=$(get_workload_id "${WORKLOAD_NAME}")
+  check_milestone "${workloadId}" "${milestoneName}"
+  create_milestone  "${workloadId}" "${milestoneName}"
+}
+
+main "${MILESTONE_NAME}"
 ```
 
 ### Configuring Notifications
