@@ -25,3 +25,16 @@ create_milestone() {
   local milestoneName=${2:-null}
   aws wellarchitected create-milestone --workload-id "${workloadId}" --milestone-name "${milestoneName}"
 }
+
+create_sns_integration() {
+  local workloadName=${1:-null}
+  local notificationEmail=${2:-null}
+  
+  topicArn=$(aws sns create-topic \
+    --name "${workloadName}")
+
+  aws sns subscribe \
+  --topic-arn "${topicArn}" \
+  --notification-endpoint "${notificationEmail}" \
+  --protocol 'email'
+}

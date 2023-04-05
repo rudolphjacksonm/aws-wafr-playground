@@ -4,6 +4,7 @@ source config/test_workload.env
 source helpers/lib.sh
 
 main() {
+  # Create workload
   aws wellarchitected create-workload \
     --account-ids "${ACCOUNT_IDS}" \
     --architectural-design "${ARCHITECTURAL_DESIGN}" \
@@ -16,6 +17,13 @@ main() {
     --pillar-priorities $PILLAR_PRIORITIES \
     --review-owner "${REVIEW_OWNER}" \
     --workload-name "${WORKLOAD_NAME}"
+
+  # Create SNS topic + subscription to NOTIFICATION_EMAIL
+  create_sns_integration "${WORKLOAD_NAME}" "${NOTIFICATION_EMAIL}"
+  
+  # Create Lambda function
+
+  # Create corresponding EventBridge rule
 }
 
 main
