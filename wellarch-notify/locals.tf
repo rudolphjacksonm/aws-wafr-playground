@@ -1,11 +1,7 @@
 locals {
   # Common
   prefix = "wellarchitected"
-  common_tags = {
-    "Service" = "well-architected-reporting"
-    "Owner"   = "someone@example.com"
-  }
-
+  
   # CloudWatch
   log_retention = 0
 

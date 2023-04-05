@@ -15,7 +15,7 @@ module "sns_topic" {
       endpoint = var.sns_endpoint
     }
   }
-  tags = local.common_tags
+  tags = var.tags
 }
 
 module "lambda_function" {
@@ -33,7 +33,7 @@ module "lambda_function" {
     TOPIC_ARN = module.sns_topic.topic_arn
   }
 
-  tags = local.common_tags
+  tags = var.tags
 }
 
 module "eventbridge" {
@@ -64,5 +64,5 @@ module "eventbridge" {
     ]
   }
 
-  tags = local.common_tags
+  tags = var.tags
 }
